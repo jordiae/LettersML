@@ -62,5 +62,5 @@ load ("problema_7_model.mod")
 test <- generarLletresCorruptes(dades,1000)
 test$label <- as.factor(test$label)
 
-p <- factor(predict (model.10x10CV, newdata=test, type="class"),levels=dades[,36])
+p <- factor(predict (model.10x10CV, newdata=test, type="raw"),levels=dades[,36])
 c <- confusionMatrix(test$label,p)
