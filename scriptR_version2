@@ -54,7 +54,7 @@ trc <- trainControl (method="repeatedcv", number=10, repeats=10,verboseIter = TR
 
 (decays <- 10^seq(-3,0,by=0.05))
 ## WARNING: this takes some minutes
-model.10x10CV <- train (label ~., data = learn, method='nnet', maxit = 300, trace = FALSE, metric="Accuracy", tuneGrid = expand.grid(.size=40,.decay=decays), trControl=trc)
+model.10x10CV <- train (label ~., data = learn, method='nnet', maxit = 300, trace = FALSE, metric="Accuracy", tuneGrid = expand.grid(.size=15,.decay=decays), trControl=trc)
 
 save(model.10x10CV,file="problema_7_model.mod")
 load ("problema_7_model.mod")
