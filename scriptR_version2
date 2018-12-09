@@ -1,0 +1,72 @@
+
+file <- "letters.txt"
+dades <- read.table(file, header = FALSE, sep = " ")
+
+
+corrompreLletra <- function(lletra) {
+
+  lletraCorrupta <- as.numeric(as.vector(lletra[1:35]))
+  nBitsCorruptes <- rpois(n=1,lambda=1.01)
+  while (nBitsCorruptes > 35) {
+    nBitsCorruptes <- rpois(n=1,lambda=1.01)
+  }
+  bitsACorrompre <- sample(lletraCorrupta,nBitsCorruptes)
+  lletraCorrupta[bitsACorrompre] <-  as.numeric(as.vector(mapply((function (x) if(x==1) 0 else 1),lletraCorrupta[bitsACorrompre])))
+
+  lletraCorrupta <- as.data.frame(c(lletraCorrupta,lletra[36]))
+
+  return(lletraCorrupta)
+}
+
+
+generarLletresCorruptes <- function(lletres,n) {
+  if (n == 0) {
+    return(data.frame())
+  }
+
+  lletresCorruptes<-as.data.frame(apply(lletres,1,corrompreLletra))
+  lletresCorruptes <- as.data.frame(t(lletresCorruptes))
+  i <- 1
+  while (i < n) {
+
+    aux <-as.data.frame(apply(lletres,1,corrompreLletra))
+    aux <- as.data.frame(t(aux))
+    lletresCorruptes <- rbind(lletresCorruptes,aux)
+
+    i <- i + 1
+  }
+  rownames(lletresCorruptes) <- c(1:(n*26))
+  colnames(lletresCorruptes) <- c(1:35,"label")
+  lletresCorruptes$label <- as.factor(lletresCorruptes$label)
+  return(lletresCorruptes)
+}
+
+
+
+
+
+
+library(caret)
+#library(MASS)
+library(nnet)
+#set.seed (4567)
+
+learn <- generarLletresCorruptes(dades,50)
+
+nn1 <- nnet(label~.,data=learn,size=5,decay=0.1,maxit=2000,trace=T)
+test <- generarLletresCorruptes(dades,10)
+test$label <- as.factor(test$label)
+p <- predict (nn1, newdata=test, type="raw")
+
+
+#(sizes <- seq(1,40,by=2)+1)
+
+## specify 10x10 CV
+#trc <- trainControl (method="repeatedcv", number=10, repeats=10,verboseIter = TRUE)
+
+#(decays <- 10^seq(-3,0,by=0.05))
+## WARNING: this takes some minutes
+#model.10x10CV <- train (y ~ x, data = mydata, method='nnet', maxit = 300, trace = FALSE,
+#                        tuneGrid = expand.grid(.size=sizes,.decay=0), trControl=trc)
+#model.10x10CV <- train (y ~ x, data = mydata, method='nnet', maxit = 300,trace = FALSE,linout = TRUE,metric = 'RMSE',
+#                        tuneGrid = expand.grid(.size=40,.decay=decays), trControl=trc)
