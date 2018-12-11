@@ -9,7 +9,7 @@ corrompreLletra <- function(lletra) {
   while (nBitsCorruptes > 35) {
     nBitsCorruptes <- rpois(n=1,lambda=1.01)
   }
-  bitsACorrompre <- sample(lletraCorrupta,nBitsCorruptes)
+  bitsACorrompre <- sample(seq(1,35),nBitsCorruptes)
   lletraCorrupta[bitsACorrompre] <-  as.numeric(as.vector(mapply((function (x) if(x==1) 0 else 1),lletraCorrupta[bitsACorrompre])))
 
   lletraCorrupta <- as.data.frame(c(lletraCorrupta,lletra[36]))
